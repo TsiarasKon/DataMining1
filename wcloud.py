@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 custom_stopwords = set(ENGLISH_STOP_WORDS)
-custom_stopwords.update(["say", "said", "saying", "just"])		# + year?
+custom_stopwords.update(["say", "said", "saying", "just", "year"])
 
 # Read the whole text.
 train_data = pd.read_csv('train_set.csv', sep="\t")
