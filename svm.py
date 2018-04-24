@@ -2,7 +2,6 @@ from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn import svm
-from sklearn.metrics import classification_report
 from sklearn import preprocessing
 from gensim.parsing.porter import PorterStemmer
 import numpy as np
@@ -40,7 +39,7 @@ y = le.transform(train_data["Category"])
 count_vectorizer = CountVectorizer(stop_words=custom_stopwords)
 X = count_vectorizer.fit_transform(train_docs)
 
-svd_model = TruncatedSVD(n_components=5, n_iter=7, random_state=42)
+svd_model = TruncatedSVD(n_components=100, n_iter=7, random_state=42)
 X = svd_model.fit_transform(X)
 
 clf = svm.SVC()

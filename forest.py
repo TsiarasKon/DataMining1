@@ -1,6 +1,7 @@
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.decomposition import TruncatedSVD
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import preprocessing
 from gensim.parsing.porter import PorterStemmer
 import numpy as np
@@ -9,7 +10,7 @@ import pandas as pd
 
 def add_titles(content, titles):
 	newcontent = []
-	times = 5;
+	times = 4;
 	for i in range(0, len(content)):
 		titlemesh = (" " + titles[i]) * times;
 		newcontent.append(content[i] + titlemesh)
@@ -20,9 +21,7 @@ custom_stopwords = set(ENGLISH_STOP_WORDS)
 custom_stopwords.update(["say", "said", "saying", "just", "year"])
 
 train_data = pd.read_csv('train_set.csv', sep="\t")
-train_data = train_data[0:100]
 test_data = pd.read_csv('test_set.csv', sep="\t")
-test_data = test_data[0:25]
 print "Loaded data"
 
 titled_train_data = add_titles(train_data['Content'], train_data['Title'])
@@ -40,11 +39,14 @@ y = le.transform(train_data["Category"])
 count_vectorizer = CountVectorizer(stop_words=custom_stopwords)
 X = count_vectorizer.fit_transform(train_docs)
 
+svd_model = TruncatedSVD(n_components=2, n_iter=7, random_state=42)
+X = svd_model.fit_transform(X)
 
-clf = MultinomialNB()
+clf = RandomForestClassifier()
 clf.fit(X, y)
 
 Test = count_vectorizer.transform(test_docs)
+Test = svd_model.transform(Test)
 
 Test_pred = clf.predict(Test)
 
@@ -56,9 +58,9 @@ print le.inverse_transform(Test_pred)
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.1)
 
-clf = MultinomialNB()
+clf = RandomForestClassifier()
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
