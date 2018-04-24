@@ -1,6 +1,7 @@
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.decomposition import TruncatedSVD
+from sklearn import svm
 from sklearn.metrics import classification_report
 from sklearn import preprocessing
 from gensim.parsing.porter import PorterStemmer
@@ -10,7 +11,7 @@ import pandas as pd
 
 def add_titles(content, titles):
 	newcontent = []
-	times = 20;
+	times = 4;
 	for i in range(0, len(content)):
 		titlemesh = (" " + titles[i]) * times;
 		newcontent.append(content[i] + titlemesh)
@@ -39,31 +40,28 @@ y = le.transform(train_data["Category"])
 count_vectorizer = CountVectorizer(stop_words=custom_stopwords)
 X = count_vectorizer.fit_transform(train_docs)
 
-'''
-svd_model = TruncatedSVD(n_components=80, n_iter=7, random_state=42)
+svd_model = TruncatedSVD(n_components=5, n_iter=7, random_state=42)
+X = svd_model.fit_transform(X)
 
-svdX = svd_model.fit_transform(X)
-'''
-
-'''
-clf = MultinomialNB()
+clf = svm.SVC()
 clf.fit(X, y)
 
 Test = count_vectorizer.transform(test_docs)
+Test = svd_model.transform(Test)
 
 Test_pred = clf.predict(Test)
 
 print le.inverse_transform(Test_pred)
-'''
+
 ################
 
 # 10-fold cross validation:
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.1)
 
-clf = MultinomialNB()
+clf = svm.SVC()
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
