@@ -12,9 +12,9 @@ K = 5	# KNN parameter
 
 def add_titles(content, titles):
 	newcontent = []
-	mult = 0.1		# Title "weights" 10% of content length
+	mult = 0.001		# Title "weights" 10% of content length
 	for i in range(0, len(content)):
-		titlemesh = (" " + titles[i]) * int(len(content[i]) * mult);
+		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult));
 		newcontent.append(content[i] + titlemesh)
 	return newcontent;
 
@@ -57,13 +57,14 @@ from sklearn.cross_validation import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.1)
 svdX_train, svdX_test, svdy_train, svdy_test = train_test_split(svdX, y, random_state=1, test_size=0.1)
 
-metrics = ["Accuracy", "Precision", "Recall", "F-Measure"]
+metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
+metrics_print = ["Accuracy", "Precision", "Recall", "F-Measure"]
 metrics_results = []
 
-metrics_results.append(nbayes.crossvalidation(X_train, X_test, y_train, y_test))
-metrics_results.append(forest.crossvalidation(svdX_train, svdX_test, svdy_train, svdy_test))
-metrics_results.append(svm.crossvalidation(svdX_train, svdX_test, svdy_train, svdy_test))
-metrics_results.append(knn.crossvalidation(svdX_train, svdX_test, svdy_train, svdy_test, K))
+metrics_results.append(nbayes.crossvalidation(X, y, metrics))
+metrics_results.append(forest.crossvalidation(svdX, y, metrics))
+metrics_results.append(svm.crossvalidation(svdX, y, metrics))
+metrics_results.append(knn.crossvalidation(svdX, y, metrics, K))
 
 cvFile = open("./EvaluationMetric_10fold.csv", "w+")
 

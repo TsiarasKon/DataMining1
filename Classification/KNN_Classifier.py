@@ -12,22 +12,23 @@ def EuclideanDistance(v1, v2, dims):
 
 
 class KNN:
-	def __init__(self):
+	def __init__(self, K):
 		self.points = []  # list of 2-tuples all points learned and their categories
 		self.categories = set()
+		self.K = K
 	
 	def fit(self, train_set, train_categories):
 		self.categories = set(train_categories)
 		for i in range(0, len(train_set)):
 			self.points.append((train_set[i], train_categories[i]))
 
-	def predict(self, test_set, K):
+	def predict(self, test_set):
 		prediction = []
 		for newpoint in test_set:
-			prediction.append(self.predict_for_one(newpoint, K))
+			prediction.append(self.predict_for_one(newpoint))
 		return prediction
 	
-	def predict_for_one(self, new_point, K):
+	def predict_for_one(self, new_point):
 		dim = len(new_point)
 		if len(self.points[0][0]) != dim:
 			print 'Error at predict_for_one: new point has wrong dimensions'
@@ -36,7 +37,7 @@ class KNN:
 		for point in self.points:
 			heappush(heap, (EuclideanDistance(point[0], new_point, dim), point[1]))
 		category_count = {c:0 for c in self.categories}
-		for i in range(0, K):   # only pop top-K (smallest K distances)
+		for i in range(0, self.K):   # only pop top-K (smallest K distances)
 			_, c = heappop(heap)
 			category_count[c] += 1
 		max = -1
