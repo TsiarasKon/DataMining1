@@ -7,7 +7,7 @@ custom_stopwords = set(ENGLISH_STOP_WORDS)
 custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
 
 # Read the whole text.
-train_data = pd.read_csv('train_set.csv', sep="\t")
+train_data = pd.read_csv('../datasets/train_set.csv', sep="\t")
 
 Categories = list(set(train_data['Category']))
 category_text_list = [[] for x in Categories]
