@@ -1,9 +1,9 @@
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.ensemble import RandomForestClassifier
 
 
 # prediction
 def predict(train_features, train_categories, test_features):
-	clf = MultinomialNB()
+	clf = RandomForestClassifier()
 	clf.fit(train_features, train_categories)
 	test_categories_prediction = clf.predict(test_features)
 	return test_categories_prediction
@@ -14,12 +14,12 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 
 
 def crossvalidation(train_features, test_features, train_categories, test_categories):
-	clf = MultinomialNB()
+	clf = RandomForestClassifier()
 	clf.fit(train_features, train_categories)
 	test_categories_prediction = clf.predict(test_features)
 	# Metrics are:
+	acs = accuracy_score(test_categories, test_categories_prediction)
 	ps = precision_score(test_categories, test_categories_prediction, average='macro')
 	rs = recall_score(test_categories, test_categories_prediction, average='macro')
 	f1s = f1_score(test_categories, test_categories_prediction, average='macro')
-	acs = accuracy_score(test_categories, test_categories_prediction)
-	return ps, rs, f1s, acs
+	return acs, ps, rs, f1s

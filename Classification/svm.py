@@ -18,9 +18,9 @@ def crossvalidation(train_features, test_features, train_categories, test_catego
 	clf.fit(train_features, train_categories)
 	test_categories_prediction = clf.predict(test_features)
 	# Metrics are:
+	acs = accuracy_score(test_categories, test_categories_prediction)
 	ps = precision_score(test_categories, test_categories_prediction, average='macro')
 	rs = recall_score(test_categories, test_categories_prediction, average='macro')
 	f1s = f1_score(test_categories, test_categories_prediction, average='macro')
-	acs = accuracy_score(test_categories, test_categories_prediction)
-	return ps, rs, f1s, acs
+	return acs, ps, rs, f1s
 
