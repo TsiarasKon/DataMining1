@@ -11,11 +11,51 @@ dataset_path = "../datasets/"
 
 def add_titles(content, titles):
 	newcontent = []
-	mult = 0.001		# Title "weights" 10% of content length
+	mult = 0.005		# Title "weights" 10% of content length
 	for i in range(0, len(content)):
-		titlemesh = (" " + titles[i]) * int(len(content[i]) * mult);
+		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult));
 		newcontent.append(content[i] + titlemesh)
 	return newcontent;
+
+
+def preprocess_data(train_data, test_data):
+	custom_stopwords = set(ENGLISH_STOP_WORDS)
+	custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
+
+	titled_train_data = add_titles(train_data['Content'], train_data['Title'])
+	if test_data is not None:
+		titled_test_data = add_titles(test_data['Content'], test_data['Title'])
+
+	# Removing stopwords:
+	new_train_data = []
+	for doc in titled_train_data:
+		doc_wordlist = doc.split()
+		new_doc_wordlist = [word for word in doc_wordlist if word not in custom_stopwords]
+		new_doc = ' '.join(new_doc_wordlist)
+		new_train_data.append(new_doc)
+	if test_data is not None:
+		new_test_data = []
+		for doc in titled_test_data:
+			doc_wordlist = doc.split()
+			new_doc_wordlist = [word for word in doc_wordlist if word not in custom_stopwords]
+			new_doc = ' '.join(new_doc_wordlist)
+			new_test_data.append(new_doc)
+
+	p = PorterStemmer()
+	train_docs = p.stem_documents(new_train_data)
+	if test_data is not None:
+		test_docs = p.stem_documents(new_test_data)
+	print "my_method: Stemmed data."
+
+	vectorizer = TfidfVectorizer()
+	X = vectorizer.fit_transform(train_docs)
+	if test_data is not None:
+		Test = vectorizer.transform(test_docs)
+	else:
+		Test = None
+	print "my_method: Vectorized data"
+
+	return X, Test
 
 
 # prediction
@@ -27,52 +67,34 @@ def predict(train_features, train_categories, test_features):
 
 
 # 10-fold cross validation
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.model_selection import cross_val_score
 
-
-def crossvalidation(train_features, test_features, train_categories, test_categories):
+def crossvalidation(train_data, y, metrics):
+	X, _ = preprocess_data(train_data, None)
 	clf = MultinomialNB()
-	clf.fit(train_features, train_categories)
-	test_categories_prediction = clf.predict(test_features)
-	# Metrics are:
-	acs = accuracy_score(test_categories, test_categories_prediction)
-	ps = precision_score(test_categories, test_categories_prediction, average='macro')
-	rs = recall_score(test_categories, test_categories_prediction, average='macro')
-	f1s = f1_score(test_categories, test_categories_prediction, average='macro')
-	return acs, ps, rs, f1s
+	scores = []
+	for metric in metrics:
+		scores.append(cross_val_score(clf, X, y, cv=10, scoring=metric).mean())
+	return scores
 
 ################################
 
-custom_stopwords = set(ENGLISH_STOP_WORDS)
-custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
+if __name__ == "__main__":
+	train_data = pd.read_csv(dataset_path + 'train_set.csv', sep="\t")
+	test_data = pd.read_csv(dataset_path + 'test_set.csv', sep="\t")
+	print "my_method: Loaded data."
 
-train_data = pd.read_csv(dataset_path + 'train_set.csv', sep="\t")
-test_data = pd.read_csv(dataset_path + 'test_set.csv', sep="\t")
-print "Loaded data."
+	le = preprocessing.LabelEncoder()
+	le.fit(train_data["Category"])
+	y = le.transform(train_data["Category"])
 
-le = preprocessing.LabelEncoder()
-le.fit(train_data["Category"])
-y = le.transform(train_data["Category"])
+	X, Test = preprocess_data(train_data, test_data)
 
-titled_train_data = add_titles(train_data['Content'], train_data['Title'])
-titled_test_data = add_titles(test_data['Content'], test_data['Title'])
+	# Prediction: 
+	Test_pred = le.inverse_transform(predict(X, y, Test))
 
-p = PorterStemmer()
-train_docs = p.stem_documents(titled_train_data)
-test_docs = p.stem_documents(titled_test_data)
-print "Stemmed data."
-
-vectorizer = TfidfVectorizer(stop_words=custom_stopwords)
-X = vectorizer.fit_transform(train_docs)
-Test = vectorizer.transform(test_docs)
-print "Vectorized data"
-
-
-# Prediction: 
-Test_pred = le.inverse_transform(predict(X, y, Test))
-
-predFile = open("./testSet_categories.csv", "w+")
-predFile.write("Id,Category\n")
-for i in range(len(Test_pred)):
-	predFile.write(str(test_data['Id'][i]) + ',' + Test_pred[i] + '\n')
-predFile.close()
+	predFile = open("./testSet_categories.csv", "w+")
+	predFile.write("Id,Category\n")
+	for i in range(len(Test_pred)):
+		predFile.write(str(test_data['Id'][i]) + ',' + Test_pred[i] + '\n')
+	predFile.close()

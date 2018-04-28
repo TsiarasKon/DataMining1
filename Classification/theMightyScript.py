@@ -12,7 +12,7 @@ K = 5	# KNN parameter
 
 def add_titles(content, titles):
 	newcontent = []
-	mult = 0.01		# Title "weights" 10% of content length
+	mult = 0.001		# Title "weights" 10% of content length
 	for i in range(0, len(content)):
 		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult));
 		newcontent.append(content[i] + titlemesh)
@@ -35,12 +35,26 @@ y = le.transform(train_data["Category"])
 titled_train_data = add_titles(train_data['Content'], train_data['Title'])
 titled_test_data = add_titles(test_data['Content'], test_data['Title'])
 
+# Removing stopwords:
+new_train_data = []
+for doc in titled_train_data:
+	doc_wordlist = doc.split()
+	new_doc_wordlist = [word for word in doc_wordlist if word not in custom_stopwords]
+	new_doc = ' '.join(new_doc_wordlist)
+	new_train_data.append(new_doc)
+new_test_data = []
+for doc in titled_test_data:
+	doc_wordlist = doc.split()
+	new_doc_wordlist = [word for word in doc_wordlist if word not in custom_stopwords]
+	new_doc = ' '.join(new_doc_wordlist)
+	new_test_data.append(new_doc)
+
 p = PorterStemmer()
-train_docs = p.stem_documents(titled_train_data)
-test_docs = p.stem_documents(titled_test_data)
+train_docs = p.stem_documents(new_train_data)
+test_docs = p.stem_documents(new_test_data)
 print "Stemmed data."
 
-vectorizer = TfidfVectorizer(stop_words=custom_stopwords)
+vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(train_docs)
 Test = vectorizer.transform(test_docs)
 print "Vectorized data"
@@ -52,6 +66,7 @@ print "SVD'd data"
 
 # Cross Validation:
 import nbayes, forest, svm, knn
+from my_method import crossvalidation as my_method_crossvalidation
 from sklearn.cross_validation import train_test_split
 
 metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
@@ -62,6 +77,7 @@ metrics_results.append(nbayes.crossvalidation(X, y, metrics))
 metrics_results.append(forest.crossvalidation(svdX, y, metrics))
 metrics_results.append(svm.crossvalidation(svdX, y, metrics))
 metrics_results.append(knn.crossvalidation(svdX, y, K))
+metrics_results.append(my_method_crossvalidation(train_data, y, metrics))
 
 cvFile = open("./EvaluationMetric_10fold.csv", "w+")
 
