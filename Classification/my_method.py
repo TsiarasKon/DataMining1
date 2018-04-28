@@ -11,7 +11,7 @@ dataset_path = "../datasets/"
 
 def add_titles(content, titles):
 	newcontent = []
-	mult = 0.1		# Title "weights" 10% of content length
+	mult = 0.001		# Title "weights" 10% of content length
 	for i in range(0, len(content)):
 		titlemesh = (" " + titles[i]) * int(len(content[i]) * mult);
 		newcontent.append(content[i] + titlemesh)
@@ -72,6 +72,7 @@ print "Vectorized data"
 Test_pred = le.inverse_transform(predict(X, y, Test))
 
 predFile = open("./testSet_categories.csv", "w+")
+predFile.write("Id,Category\n")
 for i in range(len(Test_pred)):
-	predFile.write(str(test_data['Id'][i]) + '\t' + Test_pred[i] + '\n')
+	predFile.write(str(test_data['Id'][i]) + ',' + Test_pred[i] + '\n')
 predFile.close()
