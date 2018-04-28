@@ -11,7 +11,7 @@ dataset_path = "../datasets/"
 
 def add_titles(content, titles):
 	newcontent = []
-	mult = 0.005		# Title "weights" 10% of content length
+	mult = 0.001		# Title "weights" 10% of content length
 	for i in range(0, len(content)):
 		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult));
 		newcontent.append(content[i] + titlemesh)

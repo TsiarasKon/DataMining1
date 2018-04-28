@@ -23,9 +23,9 @@ custom_stopwords = set(ENGLISH_STOP_WORDS)
 custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
 
 train_data = pd.read_csv(dataset_path + 'train_set.csv', sep="\t")
-train_data = train_data[0:3000]
+train_data = train_data[0:100]
 test_data = pd.read_csv(dataset_path + 'test_set.csv', sep="\t")
-test_data = test_data[0:500]
+test_data = test_data[0:20]
 print "Loaded data."
 
 le = preprocessing.LabelEncoder()
@@ -72,6 +72,8 @@ from sklearn.cross_validation import train_test_split
 metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
 metrics_print = ["Accuracy", "Precision", "Recall", "F-Measure"]
 metrics_results = []
+
+metrics_results.append(svm.find_best_params(svdX, y, metrics))
 
 metrics_results.append(nbayes.crossvalidation(X, y, metrics))
 metrics_results.append(forest.crossvalidation(svdX, y, metrics))
