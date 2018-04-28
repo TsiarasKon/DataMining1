@@ -10,10 +10,6 @@ def predict(train_features, train_categories, test_features):
 
 
 # 10-fold cross validation
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
-
-
-# 10-fold cross validation
 from sklearn.model_selection import cross_val_score
 
 def crossvalidation(X, y, metrics):
@@ -22,3 +18,8 @@ def crossvalidation(X, y, metrics):
 	for metric in metrics:
 		scores.append(cross_val_score(clf, X, y, cv=10, scoring=metric).mean())
 	return scores
+
+
+def get_accuracy(X, y):
+	clf = RandomForestClassifier()
+	return cross_val_score(clf, X, y, cv=10, scoring='accuracy').mean()

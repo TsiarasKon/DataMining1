@@ -5,10 +5,10 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
 import numpy as np
 import pandas as pd
+from forest import get_accuracy
 
 dataset_path = "../datasets/"
 
-K = 5	# KNN parameter
 
 def add_titles(content, titles):
 	newcontent = []
@@ -23,9 +23,7 @@ custom_stopwords = set(ENGLISH_STOP_WORDS)
 custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
 
 train_data = pd.read_csv(dataset_path + 'train_set.csv', sep="\t")
-train_data = train_data[0:100]
 test_data = pd.read_csv(dataset_path + 'test_set.csv', sep="\t")
-test_data = test_data[0:20]
 print "Loaded data."
 
 le = preprocessing.LabelEncoder()
@@ -59,36 +57,23 @@ X = vectorizer.fit_transform(train_docs)
 Test = vectorizer.transform(test_docs)
 print "Vectorized data"
 
-svd_model = TruncatedSVD(n_components=125, n_iter=7, random_state=42)
-svdX = svd_model.fit_transform(X)
-#svdTest = svd_model.transform(Test)
-print "SVD'd data"
+components = [10, 25, 50, 75, 100, 125, 150, 200]
+points = []		# (components, accuracy)
+for comp in components:
+	svd_model = TruncatedSVD(n_components=comp, n_iter=7, random_state=42)
+	svdX = svd_model.fit_transform(X)
+	acc = get_accuracy(svdX, y)
+	points.append((comp, acc))
+	print "SVD'd data with n = {} components".format(comp)
 
-# Cross Validation:
-import nbayes, forest, svm, knn
-from my_method import crossvalidation as my_method_crossvalidation
-from sklearn.cross_validation import train_test_split
+import matplotlib.pyplot as plt
 
-metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
-metrics_print = ["Accuracy", "Precision", "Recall", "F-Measure"]
-metrics_results = []
+points_x = [p[0] for p in points]
+points_y = [p[1] for p in points]
 
-metrics_results.append(svm.find_best_params(svdX, y, metrics))
-
-metrics_results.append(nbayes.crossvalidation(X, y, metrics))
-metrics_results.append(forest.crossvalidation(svdX, y, metrics))
-metrics_results.append(svm.crossvalidation(svdX, y, metrics))
-metrics_results.append(knn.crossvalidation(svdX, y, K))
-metrics_results.append(my_method_crossvalidation(train_data, y, metrics))
-
-cvFile = open("./EvaluationMetric_10fold.csv", "w+")
-
-cvFile.write("Statistic Measure\tNaive Bayes\tRandom Forest\tSVM\tKNN\tMy Method\n")
-for i in range(len(metrics)):
-	cvFile.write(metrics[i])
-	for res in metrics_results:
-		cvFile.write('\t' + str(res[i]))
-	cvFile.write('\n')
-
-
-cvFile.close()
+plt.plot(points_x, points_y)
+fig = plt.plot(points_x, points_y, 'or')
+plt.xlabel('Components')
+plt.ylabel('Accuracy')
+fig.savefig("components_plot.png")
+plt.show()
