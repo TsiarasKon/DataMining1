@@ -2,7 +2,7 @@ from sklearn import svm
 from sklearn.model_selection import GridSearchCV
 
 def find_best_params(X, y, metrics):
-	params = {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001], 'kernel': ['linear', 'rbf']}
+	params = {'C': [1, 10, 100, 1000], 'gamma': [0.1, 0.01, 0.001, 0.0001], 'kernel': ['linear', 'rbf']}
 	clf = GridSearchCV(svm.SVC(), params)
 	clf.fit(X, y)
 	return clf.best_params_
@@ -33,3 +33,4 @@ def crossvalidation(X, y, metrics):
 
 def get_accuracy(X, y):
 	return cross_val_score(svm.SVC(), X, y, cv=10, scoring='accuracy').mean()
+

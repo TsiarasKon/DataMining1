@@ -11,9 +11,9 @@ dataset_path = "../datasets/"
 
 def add_titles(content, titles):
 	newcontent = []
-	mult = 0.001		# Title "weights" 10% of content length
+	mult = 0.001		
 	for i in range(0, len(content)):
-		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult));
+		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult))
 		newcontent.append(content[i] + titlemesh)
 	return newcontent;
 
@@ -55,6 +55,14 @@ def preprocess_data(train_data, test_data):
 		Test = None
 	print "my_method: Vectorized data"
 
+
+	svd_model = TruncatedSVD(n_components=80, n_iter=7, random_state=42)
+	X = svd_model.fit_transform(X)
+	if test_data is not None:
+		Test = svd_model.transform(Test)
+	print "SVD'd data"
+
+
 	return X, Test
 
 
@@ -91,7 +99,7 @@ if __name__ == "__main__":
 	X, Test = preprocess_data(train_data, test_data)
 
 	# Prediction: 
-	Test_pred = le.inverse_transform(predict(X, y, Test))
+	Test_pred = le.inverse_transform(knn.predict(X, y, Test))
 
 	predFile = open("./testSet_categories.csv", "w+")
 	predFile.write("Id,Category\n")

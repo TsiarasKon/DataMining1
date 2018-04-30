@@ -5,10 +5,11 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
 import numpy as np
 import pandas as pd
-from forest import get_accuracy
+import svm
 
 dataset_path = "../datasets/"
 
+best_n_components = 80		# found from components_graph.py
 
 def add_titles(content, titles):
 	newcontent = []
@@ -47,25 +48,9 @@ vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(train_docs)
 print "Vectorized data"
 
-components = [25, 50, 75, 100, 125, 150, 175, 200]
-points = []		# (components, accuracy)
-for comp in components:
-	svd_model = TruncatedSVD(n_components=comp, n_iter=25, random_state=42)
-	svdX = svd_model.fit_transform(X)
-	acc = get_accuracy(svdX, y)
-	points.append((comp, acc))
-	print "SVD'd data with n = {} components".format(comp)
+svd_model = TruncatedSVD(n_components=best_n_components, n_iter=7, random_state=42)
+svdX = svd_model.fit_transform(X)
 
-import matplotlib.pyplot as plt
-
-points_x = [p[0] for p in points]
-points_y = [p[1] for p in points]
-
-plt.plot(points_x, points_y)
-plt.plot(points_x, points_y, 'or')
-plt.grid(True)
-plt.title("Random Forests Classifier")
-plt.xlabel('Components')
-plt.ylabel('Accuracy')
-plt.savefig("components_plot.png")
-plt.show()
+metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
+best_params = svm.find_best_params(svdX, y, metrics)
+print best_params

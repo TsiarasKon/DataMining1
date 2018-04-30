@@ -1,2 +1,5 @@
 Statistic Measure	Naive Bayes	Random Forest	SVM	KNN	My Method
-accuracy
+accuracy	0.9645343469543602
+precision_macro	0.9616756079927008
+recall_macro	0.9625761284853457
+f1_macro	0.9620070918068029

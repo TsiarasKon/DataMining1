@@ -12,9 +12,9 @@ K = 5	# KNN parameter
 
 def add_titles(content, titles):
 	newcontent = []
-	mult = 0.001		# Title "weights" 10% of content length
+	mult = 0.001	
 	for i in range(0, len(content)):
-		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult));
+		titlemesh = (" " + titles[i]) * max(1, int(len(content[i]) * mult))
 		newcontent.append(content[i] + titlemesh)
 	return newcontent;
 
@@ -23,9 +23,7 @@ custom_stopwords = set(ENGLISH_STOP_WORDS)
 custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
 
 train_data = pd.read_csv(dataset_path + 'train_set.csv', sep="\t")
-train_data = train_data[0:100]
 test_data = pd.read_csv(dataset_path + 'test_set.csv', sep="\t")
-test_data = test_data[0:20]
 print "Loaded data."
 
 le = preprocessing.LabelEncoder()
@@ -59,7 +57,7 @@ X = vectorizer.fit_transform(train_docs)
 Test = vectorizer.transform(test_docs)
 print "Vectorized data"
 
-svd_model = TruncatedSVD(n_components=125, n_iter=7, random_state=42)
+svd_model = TruncatedSVD(n_components=80, n_iter=7, random_state=42)
 svdX = svd_model.fit_transform(X)
 #svdTest = svd_model.transform(Test)
 print "SVD'd data"
@@ -73,13 +71,19 @@ metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
 metrics_print = ["Accuracy", "Precision", "Recall", "F-Measure"]
 metrics_results = []
 
-metrics_results.append(svm.find_best_params(svdX, y, metrics))
-
 metrics_results.append(nbayes.crossvalidation(X, y, metrics))
+print "NBayes metrics:" 
+print metrics_results[0]
 metrics_results.append(forest.crossvalidation(svdX, y, metrics))
+print "Forest metrics:"
+print metrics_results[1]
 metrics_results.append(svm.crossvalidation(svdX, y, metrics))
+print "SVM metrics:"
+print metrics_results[2]
 metrics_results.append(knn.crossvalidation(svdX, y, K))
-metrics_results.append(my_method_crossvalidation(train_data, y, metrics))
+print "KNN metrics:"
+print metrics_results[3]
+#metrics_results.append(my_method_crossvalidation(train_data, y, metrics))
 
 cvFile = open("./EvaluationMetric_10fold.csv", "w+")
 
