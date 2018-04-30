@@ -20,7 +20,7 @@ def add_titles(content, titles):
 
 
 custom_stopwords = set(ENGLISH_STOP_WORDS)
-custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
+custom_stopwords.update(["say", "says", "said", "saying", "just", "year", "man", "men", "woman", "women", "guy", "guys", "run", "running", "ran", "run", "do", "don\'t", "does", "doesn\'t" , "doing", "did", "didn\'t",  "use", "used", "continue", "number", "great", "big", "good", "bad", "better", "worse", "best", "worst", "actually", "fact", "way", "tell", "told", "include", "including", "want", "wanting", "will", "won\'t", "give", "given", "month", "day", "place", "area", "look", "looked", "far", "near", "get", "getting", "got", "know", "knows", "knew", "long", "week", "have", "has", "haven\'t", "hasn\'t", "having", "had", "hadn\'t", "not", "think", "thinking", "Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday", "high", "low", "thing", "there", "they're", "It", "I\'ve", "I\'d", "He\'s", "She\'s", "They\'ve", "I\'m", "You\'re", "your", "their", "his", "hers", "mine", "today", "yesterday", "it", "ve", "going", "go", "went", "lot", "don", "saw", "seen", "come", "came" ])
 
 train_data = pd.read_csv(dataset_path + 'train_set.csv', sep="\t")
 test_data = pd.read_csv(dataset_path + 'test_set.csv', sep="\t")
@@ -57,7 +57,7 @@ X = vectorizer.fit_transform(train_docs)
 Test = vectorizer.transform(test_docs)
 print "Vectorized data"
 
-svd_model = TruncatedSVD(n_components=80, n_iter=7, random_state=42)
+svd_model = TruncatedSVD(n_components=50, n_iter=7, random_state=42)
 svdX = svd_model.fit_transform(X)
 #svdTest = svd_model.transform(Test)
 print "SVD'd data"
