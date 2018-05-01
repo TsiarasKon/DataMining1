@@ -59,7 +59,7 @@ print "Vectorized data"
 components = [25, 50, 75, 100, 125, 150, 175, 200]
 points = []		# (components, accuracy)
 for comp in components:
-	svd_model = TruncatedSVD(n_components=comp, random_state=42)
+	svd_model = TruncatedSVD(n_components=comp)		# random_state=42
 	svdX = svd_model.fit_transform(X)
 	acc = get_accuracy(svdX, y)
 	points.append((comp, acc))

@@ -8,9 +8,9 @@ def find_best_params(X, y, metrics):
 	return clf.best_params_
 
 
-best_C = 10
-best_gamma = 0.001
-best_kernel = 'linear'
+best_C = 100
+best_gamma = 0.1
+best_kernel = 'rbf'
 
 
 # prediction

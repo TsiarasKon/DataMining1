@@ -9,7 +9,7 @@ import svm
 
 dataset_path = "../datasets/"
 
-best_n_components = 80		# found from components_graph.py
+best_n_components = 200		
 
 def add_titles(content, titles):
 	newcontent = []
@@ -57,7 +57,7 @@ vectorizer = TfidfVectorizer(sublinear_tf=True, use_idf=True)
 X = vectorizer.fit_transform(train_docs)
 print "Vectorized data"
 
-svd_model = TruncatedSVD(n_components=best_n_components, random_state=42)
+svd_model = TruncatedSVD(n_components=best_n_components)		# random_state=13
 svdX = svd_model.fit_transform(X)
 
 metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]

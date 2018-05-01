@@ -39,8 +39,7 @@ le = preprocessing.LabelEncoder()
 le.fit(train_data["Category"])
 y = le.transform(train_data["Category"])
 
-titled_train_data = add_titles(train_data['Content'], train_data['Title'])
-titled_test_data = add_titles(test_data['Content'], test_data['Title'])
+titled_train_data = add_titles(train_data['Content'], train_data['Title'])\
 
 # Removing stopwords:
 new_train_data = []
@@ -49,29 +48,21 @@ for doc in titled_train_data:
 	new_doc_wordlist = [word for word in doc_wordlist if word not in custom_stopwords]
 	new_doc = ' '.join(new_doc_wordlist)
 	new_train_data.append(new_doc)
-new_test_data = []
-for doc in titled_test_data:
-	doc_wordlist = doc.split()
-	new_doc_wordlist = [word for word in doc_wordlist if word not in custom_stopwords]
-	new_doc = ' '.join(new_doc_wordlist)
-	new_test_data.append(new_doc)
 
 p = PorterStemmer()
 train_docs = p.stem_documents(new_train_data)
-test_docs = p.stem_documents(new_test_data)
 print "Stemmed data."
 
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(train_docs)
-Test = vectorizer.transform(test_docs)
 print "Vectorized data"
-
-svd_model5 = TruncatedSVD(n_components=5, random_state=42)
+'''
+svd_model5 = TruncatedSVD(n_components=5) 		# random_state=42
 svdX5 = svd_model5.fit_transform(X)
-svd_model50 = TruncatedSVD(n_components=50, random_state=13)
-svdX50 = svd_model50.fit_transform(X)
-svd_model75 = TruncatedSVD(n_components=250, random_state=13)
-svdX75 = svd_model75.fit_transform(X)
+svd_model50 = TruncatedSVD(n_components=50) 	# random_state=13
+svdX50 = svd_model50.fit_transform(X)'''
+svd_model200 = TruncatedSVD(n_components=200)   # random_state=13
+svdX200 = svd_model200.fit_transform(X)
 print "SVD'd data"
 
 # Cross Validation:
@@ -89,13 +80,13 @@ print metrics_results[0]
 metrics_results.append(forest.crossvalidation(svdX50, y, metrics))
 print "Forest metrics:"
 print metrics_results[1]'''
-metrics_results.append(svm.crossvalidation(svdX75, y, metrics))
+metrics_results.append(svm.crossvalidation(svdX200, y, metrics))
 print "SVM metrics:"
 print metrics_results
-metrics_results.append(knn.crossvalidation(svdX5, y, K))
-'''print "KNN metrics:"
-print metrics_results[3]
-#metrics_results.append(my_method_crossvalidation(train_data, y, metrics))'''
+'''metrics_results.append(knn.crossvalidation(svdX5, y, K))
+print "KNN metrics:"
+print metrics_results[3]'''
+#metrics_results.append(my_method_crossvalidation(train_data, y, metrics))
 
 cvFile = open("./EvaluationMetric_10fold.csv", "w+")
 

@@ -65,7 +65,7 @@ def preprocess_data(train_data, test_data):
 	print "my_method: Vectorized data"
 
 
-	svd_model = TruncatedSVD(n_components=80, random_state=42)
+	svd_model = TruncatedSVD(n_components=200)		# random_state=13
 	X = svd_model.fit_transform(X)
 	if test_data is not None:
 		Test = svd_model.transform(Test)
@@ -73,14 +73,6 @@ def preprocess_data(train_data, test_data):
 
 
 	return X, Test
-
-
-# prediction
-def predict(train_features, train_categories, test_features):
-	clf = MultinomialNB()
-	clf.fit(train_features, train_categories)
-	test_categories_prediction = clf.predict(test_features)
-	return test_categories_prediction
 
 
 # 10-fold cross validation
