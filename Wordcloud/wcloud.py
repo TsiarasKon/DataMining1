@@ -35,4 +35,3 @@ for i in range(0, len(Categories)):
 	fig.savefig(wc_path)
 	plt.close()
 	print "Created and saved " + Categories[i] + " workcloud at: ./" + wc_path
-

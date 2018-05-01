@@ -56,11 +56,11 @@ print "Stemmed data."
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(train_docs)
 print "Vectorized data"
-'''
+
 svd_model5 = TruncatedSVD(n_components=5) 		# random_state=42
 svdX5 = svd_model5.fit_transform(X)
 svd_model50 = TruncatedSVD(n_components=50) 	# random_state=13
-svdX50 = svd_model50.fit_transform(X)'''
+svdX50 = svd_model50.fit_transform(X)
 svd_model200 = TruncatedSVD(n_components=200)   # random_state=13
 svdX200 = svd_model200.fit_transform(X)
 print "SVD'd data"
@@ -73,20 +73,19 @@ from sklearn.cross_validation import train_test_split
 metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
 metrics_print = ["Accuracy", "Precision", "Recall", "F-Measure"]
 metrics_results = []
-'''
+
 metrics_results.append(nbayes.crossvalidation(X, y, metrics))
 print "NBayes metrics:" 
 print metrics_results[0]
 metrics_results.append(forest.crossvalidation(svdX50, y, metrics))
 print "Forest metrics:"
-print metrics_results[1]'''
+print metrics_results[1]
 metrics_results.append(svm.crossvalidation(svdX200, y, metrics))
 print "SVM metrics:"
-print metrics_results
-'''metrics_results.append(knn.crossvalidation(svdX5, y, K))
+print metrics_results[2]
+metrics_results.append(knn.crossvalidation(svdX5, y, K))
 print "KNN metrics:"
-print metrics_results[3]'''
-#metrics_results.append(my_method_crossvalidation(train_data, y, metrics))
+print metrics_results[3]
 
 cvFile = open("./EvaluationMetric_10fold.csv", "w+")
 
@@ -97,6 +96,5 @@ for i in range(len(metrics)):
 		cvFile.write('\t' + str(res[i]))
 	cvFile.write('\t' + str(metrics_results[2][i]))		# "My Method"
 	cvFile.write('\n')
-
 
 cvFile.close()

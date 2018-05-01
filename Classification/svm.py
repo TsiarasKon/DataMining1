@@ -33,4 +33,3 @@ def crossvalidation(X, y, metrics):
 
 def get_accuracy(X, y):
 	return cross_val_score(svm.SVC(), X, y, cv=10, scoring='accuracy').mean()
-
