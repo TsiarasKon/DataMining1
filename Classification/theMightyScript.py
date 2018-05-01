@@ -57,7 +57,7 @@ X = vectorizer.fit_transform(train_docs)
 Test = vectorizer.transform(test_docs)
 print "Vectorized data"
 
-svd_model = TruncatedSVD(n_components=50, n_iter=7, random_state=42)
+svd_model = TruncatedSVD(n_components=50, n_iter=7, random_state=42, sublinear_tf=True, use_idf=True)
 svdX = svd_model.fit_transform(X)
 #svdTest = svd_model.transform(Test)
 print "SVD'd data"
