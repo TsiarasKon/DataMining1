@@ -56,7 +56,7 @@ def preprocess_data(train_data, test_data):
 	print "my_method: Vectorized data"
 
 
-	svd_model = TruncatedSVD(n_components=80, n_iter=7, random_state=42)
+	svd_model = TruncatedSVD(n_components=80, n_iter=7, random_state=42, sublinear_tf=True, use_idf=True)
 	X = svd_model.fit_transform(X)
 	if test_data is not None:
 		Test = svd_model.transform(Test)
