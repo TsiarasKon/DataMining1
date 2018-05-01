@@ -20,7 +20,16 @@ def add_titles(content, titles):
 
 
 custom_stopwords = set(ENGLISH_STOP_WORDS)
-custom_stopwords.update(["say", "says", "said", "saying", "just", "year", "man", "men", "woman", "women", "guy", "guys", "run", "running", "ran", "run", "do", "don\'t", "does", "doesn\'t" , "doing", "did", "didn\'t",  "use", "used", "continue", "number", "great", "big", "good", "bad", "better", "worse", "best", "worst", "actually", "fact", "way", "tell", "told", "include", "including", "want", "wanting", "will", "won\'t", "give", "given", "month", "day", "place", "area", "look", "looked", "far", "near", "get", "getting", "got", "know", "knows", "knew", "long", "week", "have", "has", "haven\'t", "hasn\'t", "having", "had", "hadn\'t", "not", "think", "thinking", "Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday", "high", "low", "thing", "there", "they're", "It", "I\'ve", "I\'d", "He\'s", "She\'s", "They\'ve", "I\'m", "You\'re", "your", "their", "his", "hers", "mine", "today", "yesterday", "it", "ve", "going", "go", "went", "lot", "don", "saw", "seen", "come", "came" ])
+custom_stopwords.update(["say", "says", "said", "saying", "just", "year", "man", "men", "woman", \
+	"women", "guy", "guys", "run", "running", "ran", "run", "do", "don't", "does", "doesn't" , \
+	"doing", "did", "didn't",  "use", "used", "continue", "number", "great", "big", "good", "bad", \
+	"better", "worse", "best", "worst", "actually", "fact", "way", "tell", "told", "include", "including", \
+	"want", "wanting", "will", "won't", "give", "given", "month", "day", "place", "area", "look", \
+	"looked", "far", "near", "get", "getting", "got", "know", "knows", "knew", "long", "week", "have", \
+	"has", "haven't", "hasn't", "having", "had", "hadn't", "not", "think", "thinking", "Monday", \
+	"Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday", "high", "low", "thing", "there", "they're", \
+	"It", "I've", "I'd", "He's", "She's", "They've", "I'm", "You're", "your", "their", "his", "hers", \
+	"mine", "today", "yesterday", "it", "ve", "going", "go", "went", "lot", "don", "saw", "seen", "come", "came"])
 
 train_data = pd.read_csv(dataset_path + 'train_set.csv', sep="\t")
 test_data = pd.read_csv(dataset_path + 'test_set.csv', sep="\t")
@@ -57,9 +66,12 @@ X = vectorizer.fit_transform(train_docs)
 Test = vectorizer.transform(test_docs)
 print "Vectorized data"
 
-svd_model = TruncatedSVD(n_components=50, n_iter=7, random_state=42, sublinear_tf=True, use_idf=True)
-svdX = svd_model.fit_transform(X)
-#svdTest = svd_model.transform(Test)
+svd_model5 = TruncatedSVD(n_components=5, random_state=42)
+svdX5 = svd_model5.fit_transform(X)
+svd_model50 = TruncatedSVD(n_components=50, random_state=13)
+svdX50 = svd_model50.fit_transform(X)
+svd_model75 = TruncatedSVD(n_components=250, random_state=13)
+svdX75 = svd_model75.fit_transform(X)
 print "SVD'd data"
 
 # Cross Validation:
@@ -70,28 +82,29 @@ from sklearn.cross_validation import train_test_split
 metrics = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
 metrics_print = ["Accuracy", "Precision", "Recall", "F-Measure"]
 metrics_results = []
-
+'''
 metrics_results.append(nbayes.crossvalidation(X, y, metrics))
 print "NBayes metrics:" 
 print metrics_results[0]
-metrics_results.append(forest.crossvalidation(svdX, y, metrics))
+metrics_results.append(forest.crossvalidation(svdX50, y, metrics))
 print "Forest metrics:"
-print metrics_results[1]
-metrics_results.append(svm.crossvalidation(svdX, y, metrics))
+print metrics_results[1]'''
+metrics_results.append(svm.crossvalidation(svdX75, y, metrics))
 print "SVM metrics:"
-print metrics_results[2]
-metrics_results.append(knn.crossvalidation(svdX, y, K))
-print "KNN metrics:"
+print metrics_results
+metrics_results.append(knn.crossvalidation(svdX5, y, K))
+'''print "KNN metrics:"
 print metrics_results[3]
-#metrics_results.append(my_method_crossvalidation(train_data, y, metrics))
+#metrics_results.append(my_method_crossvalidation(train_data, y, metrics))'''
 
 cvFile = open("./EvaluationMetric_10fold.csv", "w+")
 
 cvFile.write("Statistic Measure\tNaive Bayes\tRandom Forest\tSVM\tKNN\tMy Method\n")
 for i in range(len(metrics)):
-	cvFile.write(metrics[i])
+	cvFile.write(metrics_print[i])
 	for res in metrics_results:
 		cvFile.write('\t' + str(res[i]))
+	cvFile.write('\t' + str(metrics_results[2][i]))		# "My Method"
 	cvFile.write('\n')
 
 

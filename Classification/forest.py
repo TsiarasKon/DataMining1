@@ -13,7 +13,7 @@ def predict(train_features, train_categories, test_features):
 from sklearn.model_selection import cross_val_score
 
 def crossvalidation(X, y, metrics):
-	clf = RandomForestClassifier()
+	clf = RandomForestClassifier(random_state=13)
 	scores = []
 	for metric in metrics:
 		scores.append(cross_val_score(clf, X, y, cv=10, scoring=metric).mean())
@@ -21,5 +21,5 @@ def crossvalidation(X, y, metrics):
 
 
 def get_accuracy(X, y):
-	clf = RandomForestClassifier()
+	clf = RandomForestClassifier(random_state=13)
 	return cross_val_score(clf, X, y, cv=10, scoring='accuracy').mean()

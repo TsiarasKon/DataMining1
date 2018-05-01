@@ -20,7 +20,16 @@ def add_titles(content, titles):
 
 def preprocess_data(train_data, test_data):
 	custom_stopwords = set(ENGLISH_STOP_WORDS)
-	custom_stopwords.update(["say", "says", "said", "saying", "just", "year"])
+	custom_stopwords.update(["say", "says", "said", "saying", "just", "year", "man", "men", "woman", \
+		"women", "guy", "guys", "run", "running", "ran", "run", "do", "don't", "does", "doesn't" , \
+		"doing", "did", "didn't",  "use", "used", "continue", "number", "great", "big", "good", "bad", \
+		"better", "worse", "best", "worst", "actually", "fact", "way", "tell", "told", "include", "including", \
+		"want", "wanting", "will", "won't", "give", "given", "month", "day", "place", "area", "look", \
+		"looked", "far", "near", "get", "getting", "got", "know", "knows", "knew", "long", "week", "have", \
+		"has", "haven't", "hasn't", "having", "had", "hadn't", "not", "think", "thinking", "Monday", \
+		"Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday", "high", "low", "thing", "there", "they're", \
+		"It", "I've", "I'd", "He's", "She's", "They've", "I'm", "You're", "your", "their", "his", "hers", \
+		"mine", "today", "yesterday", "it", "ve", "going", "go", "went", "lot", "don", "saw", "seen", "come", "came"])
 
 	titled_train_data = add_titles(train_data['Content'], train_data['Title'])
 	if test_data is not None:
@@ -56,7 +65,7 @@ def preprocess_data(train_data, test_data):
 	print "my_method: Vectorized data"
 
 
-	svd_model = TruncatedSVD(n_components=80, n_iter=7, random_state=42, sublinear_tf=True, use_idf=True)
+	svd_model = TruncatedSVD(n_components=80, random_state=42)
 	X = svd_model.fit_transform(X)
 	if test_data is not None:
 		Test = svd_model.transform(Test)
@@ -99,7 +108,8 @@ if __name__ == "__main__":
 	X, Test = preprocess_data(train_data, test_data)
 
 	# Prediction: 
-	Test_pred = le.inverse_transform(knn.predict(X, y, Test))
+	import svm
+	Test_pred = le.inverse_transform(svm.predict(X, y, Test))
 
 	predFile = open("./testSet_categories.csv", "w+")
 	predFile.write("Id,Category\n")

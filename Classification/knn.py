@@ -30,7 +30,7 @@ def crossvalidation(X, y, K):
 		scores[3].append(f1_score(y_test, y_pred, average='macro'))
 	return np.mean(scores[0]), np.mean(scores[1]), np.mean(scores[2]), np.mean(scores[3])
 
-def get_accuracy(X, y):
+def get_accuracy(X, y, K):
 	skf = StratifiedKFold(n_splits=10)
 	acc = []
 	for train_index, test_index in skf.split(X, y):
